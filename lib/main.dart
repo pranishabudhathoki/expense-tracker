@@ -1,22 +1,17 @@
-import 'package:expensestracker/transaction.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:expensestracker/widgets/new_transaction.dart';
+
+import './models/transaction.dart';
+
+import 'package:expensestracker/widgets/transaction_list.dart';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Expenses Tracker"),
-          centerTitle: true,
-        ),
-        body: ExpensePage(),
-      ),
-    );
+    return MaterialApp(home: ExpensePage());
   }
 }
 
@@ -26,7 +21,7 @@ class ExpensePage extends StatefulWidget {
 }
 
 class _ExpensePageState extends State<ExpensePage> {
-  List<Transaction> transactions = [
+  List<Transaction> _userTransactions = [
     Transaction(
         itemName: "Grocesires", itemPrice: 12.50, itemDate: DateTime.now()),
     Transaction(
@@ -34,99 +29,64 @@ class _ExpensePageState extends State<ExpensePage> {
     Transaction(
         itemName: "jacket", itemPrice: 1500.50, itemDate: DateTime.now()),
   ];
-  String itemName;
-  String itemPrice;
+  void _addNewTransaction(String txName, double txPrice) {
+    final newTx = Transaction(
+        itemName: txName, itemPrice: txPrice, itemDate: DateTime.now());
+    setState(() {
+      _userTransactions.add(newTx);
+    });
+  }
+
+  void _showAddTransaction(BuildContext bCtx) {
+    showModalBottomSheet(
+        context: bCtx,
+        builder: (ctx) {
+          return NewTransaction(_addNewTransaction);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          width: double.infinity,
-          child: Card(
-            child: Text("Chart"),
-            elevation: 5,
-          ),
-        ),
-        Card(
-          elevation: 5,
-          child: Container(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                TextField(
-                    decoration: InputDecoration(labelText: "Item Name"),
-                    onChanged: (val) {
-                      itemName = val;
-                    }),
-                TextField(
-                    decoration: InputDecoration(labelText: "Item Price"),
-                    onChanged: (val) {
-                      itemPrice = val;
-                    }),
-                RaisedButton(
-                  child: Text("Add Transaction"),
-                  textColor: Colors.white,
-                  onPressed: () {
-                    setState(() {
-                      transactions.add(Transaction(
-                          itemPrice: double.parse(itemPrice),
-                          itemName: itemName,
-                          itemDate: DateTime.now()));
-                    });
-                  },
-                )
-              ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Expenses Tracker"),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
+            onPressed: () {
+              _showAddTransaction(context);
+            },
           ),
-        ),
-        Column(
-          children: transactions.map((tx) {
-            return Card(
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      '\$' + tx.itemPrice.toString(),
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                      color: Colors.green,
-                      width: 2,
-                    )),
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                    padding: EdgeInsets.all(5.0),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        tx.itemName,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMEd().format(tx.itemDate),
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  )
-                ],
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              child: Card(
+                child: Text("Chart"),
+                elevation: 5,
               ),
-            );
-          }).toList(),
-        )
-      ],
+            ),
+            TransactionList(_userTransactions),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          _showAddTransaction(context);
+        },
+      ),
     );
   }
 }
