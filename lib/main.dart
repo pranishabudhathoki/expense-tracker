@@ -1,5 +1,6 @@
 import 'package:expensestracker/widgets/chart.dart';
 import 'package:expensestracker/widgets/new_transaction.dart';
+import 'package:flutter/services.dart';
 
 import './models/transaction.dart';
 
@@ -7,7 +8,15 @@ import 'package:expensestracker/widgets/transaction_list.dart';
 
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  //------disable landscape mode and ensures only portrait mode--
+//  WidgetsFlutterBinding.ensureInitialized();
+//  SystemChrome.setPreferredOrientations(
+//      [DeviceOrientation.portraitUp, DeviceOrientation.portraitUp]).then((_) {
+//    runApp(MyApp());
+//  });
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -43,14 +52,8 @@ class ExpensePage extends StatefulWidget {
 
 class _ExpensePageState extends State<ExpensePage> {
   //total transaction done by user.
-  List<Transaction> _userTransactions = [
-//    Transaction(
-//        itemName: "Grocesires", itemPrice: 12.50, itemDate: DateTime.now()),
-//    Transaction(
-//        itemName: "watch", itemPrice: 1250.50, itemDate: DateTime.now()),
-//    Transaction(
-//        itemName: "jacket", itemPrice: 1500.50, itemDate: DateTime.now()),
-  ];
+  List<Transaction> _userTransactions = [];
+  bool _showChart = false;
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
       return tx.itemDate.isAfter(DateTime.now().subtract(Duration(days: 7)));
@@ -108,16 +111,32 @@ class _ExpensePageState extends State<ExpensePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Container(
-                height: (MediaQuery.of(context).size.height * 0.3) -
-                    appBar.preferredSize.height -
-                    MediaQuery.of(context).padding.top,
-                child: Chart(_recentTransactions)),
-            Container(
-                height: (MediaQuery.of(context).size.height * 0.7) -
-                    appBar.preferredSize.height -
-                    MediaQuery.of(context).padding.top,
-                child: TransactionList(_userTransactions, _deleteTransaction)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text("Show chart"),
+                Switch(
+                  value: _showChart,
+                  onChanged: (value) {
+                    setState(() {
+                      _showChart = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+            _showChart
+                ? Container(
+                    height: (MediaQuery.of(context).size.height * 0.3) -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top,
+                    child: Chart(_recentTransactions))
+                : Container(
+                    height: (MediaQuery.of(context).size.height * 0.7) -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top,
+                    child:
+                        TransactionList(_userTransactions, _deleteTransaction)),
           ],
         ),
       ),
