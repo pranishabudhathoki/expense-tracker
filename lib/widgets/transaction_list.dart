@@ -21,8 +21,11 @@ class TransactionList extends StatelessWidget {
                     "No expenses added yet!",
                     style: Theme.of(context).textTheme.title,
                   ),
+                  SizedBox(
+                    height: constraints.maxHeight * 0.03,
+                  ),
                   Container(
-                    height: 200,
+                    height: constraints.maxHeight * 0.7,
                     child: Image.asset(
                       "assets/images/box.png",
                       fit: BoxFit.cover,

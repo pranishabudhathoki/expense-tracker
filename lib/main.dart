@@ -91,6 +91,8 @@ class _ExpensePageState extends State<ExpensePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final appBar = AppBar(
       title: Text("Expenses Tracker"),
       centerTitle: true,
@@ -111,32 +113,47 @@ class _ExpensePageState extends State<ExpensePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("Show chart"),
-                Switch(
-                  value: _showChart,
-                  onChanged: (value) {
-                    setState(() {
-                      _showChart = value;
-                    });
-                  },
-                ),
-              ],
-            ),
-            _showChart
-                ? Container(
-                    height: (MediaQuery.of(context).size.height * 0.3) -
-                        appBar.preferredSize.height -
-                        MediaQuery.of(context).padding.top,
-                    child: Chart(_recentTransactions))
-                : Container(
-                    height: (MediaQuery.of(context).size.height * 0.7) -
-                        appBar.preferredSize.height -
-                        MediaQuery.of(context).padding.top,
-                    child:
-                        TransactionList(_userTransactions, _deleteTransaction)),
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text("Show chart"),
+                  Switch(
+                    value: _showChart,
+                    onChanged: (value) {
+                      setState(() {
+                        _showChart = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            if (!isLandscape)
+              Container(
+                  height: (MediaQuery.of(context).size.height * 0.3) -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top,
+                  child: Chart(_recentTransactions)),
+            if (!isLandscape)
+              Container(
+                  height: (MediaQuery.of(context).size.height * 0.7) -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top,
+                  child:
+                      TransactionList(_userTransactions, _deleteTransaction)),
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      height: (MediaQuery.of(context).size.height * 0.7) -
+                          appBar.preferredSize.height -
+                          MediaQuery.of(context).padding.top,
+                      child: Chart(_recentTransactions))
+                  : Container(
+                      height: (MediaQuery.of(context).size.height * 0.7) -
+                          appBar.preferredSize.height -
+                          MediaQuery.of(context).padding.top,
+                      child: TransactionList(
+                          _userTransactions, _deleteTransaction)),
           ],
         ),
       ),
